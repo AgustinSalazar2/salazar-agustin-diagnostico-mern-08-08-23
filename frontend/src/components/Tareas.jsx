@@ -1,6 +1,7 @@
 import "react";
 import { useEffect, useState } from "react";
 import "./tareas.css";
+import Swal from "sweetalert2";
 
 const Tareas = () => {
   const [tareas, setTareas] = useState([]);
@@ -44,12 +45,39 @@ const Tareas = () => {
     }
   };
 
+
+  // const eliminarTarea = async (id) => {
+
+  //   try {
+  //     await fetch(`http://localhost:4000/task/${id}`, {
+  //       method: "DELETE",
+  //     });
+  //     obtenerTareas();
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
   const eliminarTarea = async (id) => {
     try {
-      await fetch(`http://localhost:4000/task/${id}`, {
-        method: "DELETE",
+      Swal.fire({
+        title: "Estas seguro?",
+        text: "Esta accion es irreversible!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si, eliminar ésto!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await fetch(`http://localhost:4000/task/${id}`, {
+            method: "DELETE",
+          });
+          obtenerTareas();
+
+          Swal.fire("Eliminado!", "Tarea eliminada correctamente.", "success");
+        }
       });
-      obtenerTareas();
     } catch (error) {
       console.error(error);
     }
@@ -93,12 +121,37 @@ const Tareas = () => {
     }
   };
 
+  // const cambiarEstado = async (id) => {
+  //   try {
+  //     await fetch(`http://localhost:4000/task/done/${id}`, {
+  //       method: "PUT",
+  //     });
+  //     obtenerTareas();
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
   const cambiarEstado = async (id) => {
     try {
-      await fetch(`http://localhost:4000/task/done/${id}`, {
-        method: "PUT",
+      Swal.fire({
+        title: "Estas seguro?",
+        text: "Esta accion es irreversible!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si, completar tarea!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await fetch(`http://localhost:4000/task/done/${id}`, {
+            method: "PUT",
+          });
+          obtenerTareas();
+
+          Swal.fire("Completada!", "Tarea marcada como completa.", "success");
+        }
       });
-      obtenerTareas();
     } catch (error) {
       console.error(error);
     }
@@ -111,7 +164,7 @@ const Tareas = () => {
   return (
     <>
       <div>
-        <div className="input-container">
+        <form className="input-container">
           {showUpdateForm ? <h2>Actualizar Tarea</h2> : <h2>Agregar Tarea</h2>}
           <input
             className="input-prod"
@@ -142,33 +195,36 @@ const Tareas = () => {
               Agregar{" "}
             </button>
           )}
-        </div>
+        </form>
 
         <h2>Listado de las Tareas</h2>
         <div className="cards-container">
-          {tareas.length>0 && tareas.map((tarea) => (
-            <div className="card" key={tarea._id}>
-              <h3>Titulo: {tarea.title}</h3>
-              <h4>Descripcion: {tarea.description}</h4>
-              <h4>Estado: {(!tarea.finished)?"Pendiente":"Completa"}</h4>
-              <div className="button-container">
-                <button onClick={() => eliminarTarea(tarea._id)}>
-                  Eliminar
-                </button>
-                
-                {(!tarea.finished) &&
-                  <>
-                    <button onClick={() => mostrarFormularioActualizar(tarea)}>
-                      Editar
-                    </button>
-                    <button onClick={() => cambiarEstado(tarea._id)}>
-                      Completo
-                    </button>
-                  </>
-                }
+          {tareas.length > 0 &&
+            tareas.map((tarea) => (
+              <div className="card" key={tarea._id}>
+                <h3>Titulo: {tarea.title}</h3>
+                <h4>Descripcion: {tarea.description}</h4>
+                <h4>Estado: {!tarea.finished ? "Pendiente" : "Completa"}</h4>
+                <div className="button-container">
+                  <button onClick={() => eliminarTarea(tarea._id)}>
+                    Eliminar
+                  </button>
+
+                  {!tarea.finished && (
+                    <>
+                      <button
+                        onClick={() => mostrarFormularioActualizar(tarea)}
+                      >
+                        Editar
+                      </button>
+                      <button onClick={() => cambiarEstado(tarea._id)}>
+                        Completo
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </>

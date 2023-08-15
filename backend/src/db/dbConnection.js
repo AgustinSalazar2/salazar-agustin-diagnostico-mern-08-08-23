@@ -7,6 +7,7 @@ const dbConnect = ()=> {
     } catch (error) {
         console.log('Error al conectar la BD');
         console.log(error.message);
+        process.exit(1);
     }
 }
 
